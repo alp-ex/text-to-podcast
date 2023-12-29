@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Text to Podcast</title>
+</head>
+
+<body>
+    <form id="textForm">
+        <textarea id="textInput" placeholder="Enter your text here"></textarea>
+        <button type="submit">Create Podcast</button>
+    </form>
+
+    <audio id="audioPlayer" controls style="display: none;">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        document.getElementById('textForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            var text = document.getElementById('textInput').value;
+
+            // AJAX request to back-end
+            fetch('/create-podcast', {
+                method: 'POST',
+                body: JSON.stringify({ text: text }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.blob();
+                })
+                .then(audioBlob => {
+                    var audioPlayer = document.getElementById('audioPlayer');
+                    audioPlayer.src = URL.createObjectURL(audioBlob);
+                    audioPlayer.style.display = 'block'; // Show the player
+                    audioPlayer.load(); // Load the new audio source
+                    audioPlayer.play(); // Auto-play the audio
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                });
+        });
+    </script>
+</body>
+
+</html>
