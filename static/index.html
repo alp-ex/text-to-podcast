@@ -3,30 +3,124 @@
 
 <head>
     <title>Text to Podcast</title>
+    <style>
+        body {
+            background-image: url('./studio-background.png');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+        }
+
+        #textForm {
+            width: 50%;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #textInput {
+            width: calc(100% - 40px);
+            margin: 10px 0;
+            box-sizing: border-box;
+            height: 150px;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #dddddd;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #ff4d4d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        button:hover {
+            background-color: #ff3333;
+        }
+
+        #audioPlayer {
+            width: calc(100% - 40px);
+            margin: 10px 0;
+            box-sizing: border-box;
+            display: none;
+        }
+
+        #submitButton {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #submitButton span {
+            margin-left: 5px;
+        }
+
+        .button-spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            margin-right: 5px;
+            animation: spin 1s linear infinite;
+        }
+
+        button.loading {
+            pointer-events: none;
+            /* Disables the button */
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </head>
 
 <body>
     <form id="textForm">
         <textarea id="textInput" placeholder="Enter your text here"></textarea>
-        <button type="submit">Create Podcast</button>
+        <button type="submit" id="submitButton">Create Podcast</button>
+        <audio id="audioPlayer" controls></audio>
     </form>
 
-    <audio id="audioPlayer" controls style="display: none;">
-        Your browser does not support the audio element.
-    </audio>
+
 
     <script>
         document.getElementById('textForm').addEventListener('submit', function (event) {
             event.preventDefault();
+
+            var submitButton = document.getElementById('submitButton');
             var text = document.getElementById('textInput').value;
 
-            // AJAX request to back-end
+            submitButton.classList.add('loading');
+            submitButton.innerHTML = '<div class="button-spinner"></div><span>Crafting your podcast masterpiece</span>';
+
             fetch('/create-podcast', {
                 method: 'POST',
                 body: JSON.stringify({ text: text }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Content-Type': 'application/json' }
             })
                 .then(response => {
                     if (!response.ok) {
@@ -37,12 +131,16 @@
                 .then(audioBlob => {
                     var audioPlayer = document.getElementById('audioPlayer');
                     audioPlayer.src = URL.createObjectURL(audioBlob);
-                    audioPlayer.style.display = 'block'; // Show the player
-                    audioPlayer.load(); // Load the new audio source
-                    audioPlayer.play(); // Auto-play the audio
+                    audioPlayer.style.display = 'block';
+                    audioPlayer.load();
+                    audioPlayer.play();
                 })
                 .catch(error => {
                     console.error('There has been a problem with your fetch operation:', error);
+                })
+                .finally(() => {
+                    submitButton.classList.remove('loading');
+                    submitButton.innerHTML = 'Create Podcast';
                 });
         });
     </script>
