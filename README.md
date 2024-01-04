@@ -1,5 +1,3 @@
-# Readme for Text-to-Podcast Web Application
-
 ## Overview
 This web application is designed to convert text input into a podcast-style audio format. Utilizing the capabilities of OpenAI's GPT models and text-to-speech technology, the application creates dynamic, two-speaker podcast dialogues from the provided text. This innovative tool is perfect for transforming written content into engaging, auditory experiences, making it suitable for educational, entertainment, or content creation purposes.
 
